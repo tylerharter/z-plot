@@ -687,12 +687,14 @@ class writer:
         if outfile == 'stdout':
             for line in self.commands:
                 print(line)
-        else:
+        elif isinstance(outfile, str):
             fd = open(outfile, 'w')
             for line in self.commands:
                 fd.write(line + '\n')
             fd.close()
-        return
+        else:
+            for line in self.commands:
+                outfile.write(line + '\n')
 
 #
 # --class-- postscript_drawer IGNORE
@@ -1723,6 +1725,10 @@ class canvas:
                  # of the form: 'title.canvas_type'
                  title = 'default',
 
+                 # File name or fd (file object). Default based
+                 # on title if not provided.
+                 output_file = None,
+
                  # Size of the drawing surface.
                  dimensions = ['3in','2in'],
 
@@ -1747,8 +1753,8 @@ class canvas:
 
         self.colors = color()
         self.fontinfo = fontsize()
-        
-        self.output_file = title + '.' + canvas_type
+
+        self.output_file = output_file if output_file else title + '.' + canvas_type
 
         self.width = self.convert(str(dimensions[0]))
         self.height = self.convert(str(dimensions[1]))
